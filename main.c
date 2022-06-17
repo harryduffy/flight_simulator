@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <time.h>
 #include "simulator.h"
 
 /*
@@ -24,27 +26,16 @@ int main(int argc, char** argv) {
 
     int plane_rows = strtol(argv[1], NULL, 10);
     int plane_cols = strtol(argv[2], NULL, 10);
-    if (0 == plane_rows) {
-        printf("Invalid amount of plane rows. Location: %s.%d\n", __FILE__, __LINE__);
-        return -1;
-    } else if (0 == plane_cols) {
-        printf("Invalid amount of plane cols. Location: %s.%d\n", __FILE__, __LINE__);
+    if (-1 == check_input(plane_rows, plane_cols)) {
         return -1;
     }
-
-    if (plane_cols % 2 != 0) {
-        printf("Invalid amount of plane cols. Location: %s.%d\n", __FILE__, __LINE__);
-        return -1;
-    } else if (plane_cols < 4) {
-        printf("Invalid amount of plane cols. Location: %s.%d\n", __FILE__, __LINE__);
-        return -1;
-    }
+    
 
     // instantiate the plane
     Passenger** passengers = plane_init(plane_rows, plane_cols);
 
-    // represent the plane in current state
-    repr_plane(plane_rows, plane_cols, passengers);
+    // simulate by rows
+    simulate_by_rows(plane_rows, plane_cols, passengers);
 
     // free all heap-based memory
     plane_destroy(plane_rows, passengers);
@@ -71,7 +62,7 @@ Passenger** plane_init(int amount_rows, int amount_cols) {
         Passenger* row = (Passenger*) malloc(amount_cols*sizeof(Passenger));
 
         for (int c = 0; c < amount_cols; c++) {
-            Passenger p = {.id=pass_id, .in_seat=0, .row=r, .col=c};
+            Passenger p = {.id=pass_id, .in_seat=0, .in_row=0, .row=r, .col=c};
             row[c] = p;
             pass_id++;
         }
@@ -122,4 +113,120 @@ void simulate_by_rows(int amount_rows, int amount_cols, Passenger** passengers) 
             - above point surmised: only once all members of a certain row have reached their row can they get into their seat
             - passengers load plane at a rate of 1 person per second
     */
+
+    printf("\nSeating front:\n");
+    repr_plane(amount_rows, amount_cols, passengers);
+    printf("\n");
+    clock_t t = clock();
+    // O(n^2)
+    int amount_seated = 0;
+    while(amount_seated < ((amount_rows/2)*amount_cols)) {
+        
+        int row = rand() % amount_rows/2; 
+        int col = rand() % amount_cols;
+
+        if (1 == passengers[row][col].in_row) {
+            continue;
+        }
+        
+        if (1 != passengers[row][col].in_row) {
+            printf("Passenger %d is walking to their seat.\n", passengers[row][col].id);
+            printf("|");
+            for (int t = 0; t < row; t++) {
+                printf("-");
+                fflush(stdout);
+                sleep(1);
+            }
+            printf("|\n");
+
+            passengers[row][col].in_row = 1;
+            
+            int counter = 0;
+            for (int c = 0; c < amount_cols; c++) {
+                if (1 == passengers[row][c].in_row) {
+                    counter++;
+                }
+            }
+            if (counter == amount_cols) {
+                printf("\nRow %d has been filled!\n", row);
+                for (int c = 0; c < amount_cols; c++) {
+                    passengers[row][c].in_seat = 1;
+                }
+                repr_plane(amount_rows, amount_cols, passengers);
+                printf("\n");
+                amount_seated += amount_cols;
+            }
+        }
+        sleep(1);
+    }
+
+    printf("Seating back:\n");
+    repr_plane(amount_rows, amount_cols, passengers);
+    printf("\n");
+    amount_seated = 0;
+    while(amount_seated < ((amount_rows/2)*amount_cols)) {
+        
+        int row = (amount_rows/2) + rand() % amount_rows/2; 
+        int col = rand() % amount_cols;
+
+        if (1 == passengers[row][col].in_row) {
+            continue;
+        }
+        
+        if (1 != passengers[row][col].in_row) {
+            printf("Passenger %d is walking to their seat.\n", passengers[row][col].id);
+            printf("|");
+            for (int t = 0; t < row; t++) {
+                printf("-");
+                fflush(stdout);
+                sleep(1);
+            }
+            printf("|\n");
+
+            passengers[row][col].in_row = 1;
+            
+            int counter = 0;
+            for (int c = 0; c < amount_cols; c++) {
+                if (1 == passengers[row][c].in_row) {
+                    counter++;
+                }
+            }
+            if (counter == amount_cols) {
+                for (int c = 0; c < amount_cols; c++) {
+                    passengers[row][c].in_seat = 1;
+                }
+                repr_plane(amount_rows, amount_cols, passengers);
+                printf("\n");
+                amount_seated += amount_cols;
+            }
+        }
+        sleep(1);
+    }
+    t = clock() - t;
+
+    printf("Everyone seated. Time taken: %lu seconds.\n", t);
+    printf("By Harry Duffy\n\n");
+    
+    
+}
+
+int check_input(int amount_rows, int amount_cols) {
+
+    if (0 == amount_rows) {
+        printf("Invalid amount of plane rows. Location: %s.%d\n", __FILE__, __LINE__);
+        return -1;
+    } else if (0 == amount_cols) {
+        printf("Invalid amount of plane cols. Location: %s.%d\n", __FILE__, __LINE__);
+        return -1;
+    }
+
+    if (amount_cols % 2 != 0) {
+        printf("Invalid amount of plane cols. Location: %s.%d\n", __FILE__, __LINE__);
+        return -1;
+    } else if (amount_cols < 4) {
+        printf("Invalid amount of plane cols. Location: %s.%d\n", __FILE__, __LINE__);
+        return -1;
+    }
+
+    return 1;
 }
