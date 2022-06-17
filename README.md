@@ -1,6 +1,6 @@
 # Plane Loading Simulator
 
-The other day I was waiting to board a plane to the Goald Coast, when the attendant called the back half of passengers to board the plane (rows &fracn2;). I then started thinking about what was a quicker **loading scheme**:
+The other day I was waiting to board a plane to the Goald Coast, when the attendant called the back half of passengers to board the plane (rows &frac12;). I then started thinking about what was a quicker **loading scheme**:
 1. loading the plane by row, like the attendant had done, or
 2. loading the plane by column
 
