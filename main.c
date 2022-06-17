@@ -11,8 +11,6 @@
             \/
     i. A-B-C -|- E-F-G
     j. A-B-C -|- E-F-G
-    k. A-B-C -|- E-F-G
-    l. A-B-C -|- E-F-G
     _______/\ ________
             \/
     n. A-B-C -|- E-F-G
@@ -45,10 +43,11 @@ int main(int argc, char** argv) {
     // instantiate the plane
     Passenger** passengers = plane_init(plane_rows, plane_cols);
 
+    // represent the plane in current state
     repr_plane(plane_rows, plane_cols, passengers);
 
     // free all heap-based memory
-    plane_destroy(passengers);
+    plane_destroy(plane_rows, passengers);
 
     return 0;
 
@@ -72,7 +71,7 @@ Passenger** plane_init(int amount_rows, int amount_cols) {
         Passenger* row = (Passenger*) malloc(amount_cols*sizeof(Passenger));
 
         for (int c = 0; c < amount_cols; c++) {
-            Passenger p = {.id=pass_id, .row=r, .col=c};
+            Passenger p = {.id=pass_id, .in_seat=0, .row=r, .col=c};
             row[c] = p;
             pass_id++;
         }
@@ -83,11 +82,12 @@ Passenger** plane_init(int amount_rows, int amount_cols) {
 
 }
 
-int plane_destroy(Passenger** passengers) {
-    // free(passengers);
-    // need to free all the rows as well
-
-    // can check error codes here or something
+int plane_destroy(int amount_rows, Passenger** passengers) {
+    
+    for (int r = 0; r < amount_rows; r++) {
+        free(passengers[r]);
+    }
+    free(passengers);
 
     return 1;
 }
@@ -98,13 +98,28 @@ void repr_plane(int amount_rows, int amount_cols, Passenger** passengers) {
         printf("Row #%d. ", r);
         for (int c = 0; c < amount_cols; c++) {
             if (c == amount_cols-1) {
-                printf("%d\n", passengers[r][c].id);
+                printf("%d\n", passengers[r][c].in_seat);
                 continue;
             } else if (c == amount_cols/2) {
-                printf("|-%d-", passengers[r][c].id);
+                printf("|-%d-", passengers[r][c].in_seat);
                 continue;
             }
-            printf("%d-", passengers[r][c].id);
+            printf("%d-", passengers[r][c].in_seat);
         }
     }
+}
+
+void simulate_by_rows(int amount_rows, int amount_cols, Passenger** passengers) {
+
+    // can do like percent in seat and stuff would be cool
+    
+    /*
+        Idea:
+            - passengers load plane by back half then by front half (back half must be completely filled before front half enters)
+            - passengers load the plane randomly, some passengers may have to wait at their row
+                before they can be seated (if they are not on window seat or middle seat if window seat has already
+                been filled)
+            - above point surmised: only once all members of a certain row have reached their row can they get into their seat
+            - passengers load plane at a rate of 1 person per second
+    */
 }
