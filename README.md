@@ -1,10 +1,8 @@
 # Plane Loading Simulator
 
-The other day I was waiting to board a plane to the Goald Coast, when the attendant called the back half of passengers to board the plane (rows &frac12;). I then started thinking about what was a quicker **loading scheme**:
+The other day I was waiting to board a plane to the Goald Coast, when the attendant called the back half of passengers to board the plane (rows <img src="https://latex.codecogs.com/svg.image?\frac{n}{2}&space;\rightarrow&space;n" title="https://latex.codecogs.com/svg.image?\frac{n}{2} \rightarrow n" />). I then started thinking about what was a quicker **loading scheme**:
 1. loading the plane by row, like the attendant had done, or
 2. loading the plane by column
-
-<img src="https://latex.codecogs.com/svg.image?\frac{n}{2}&space;\rightarrow&space;n" title="https://latex.codecogs.com/svg.image?\frac{n}{2} \rightarrow n" />
 
 That is, loading the row by outside columns to inside columns. This made more sense to me, as the *queue's* to enter a certain row experience no blocking. My hypothesis is that loading the plane by column is quicker.
 
