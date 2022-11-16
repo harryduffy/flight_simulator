@@ -1,0 +1,5 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory `/Users/harryduffy/Desktop/Projects/flight_simulator'
+gcc -Wall -Werror -Wvla -O0 -std=c11 -g -fsanitize=address  -lm  main.c   -o main
+make: Leaving directory `/Users/harryduffy/Desktop/Projects/flight_simulator'
+ 
